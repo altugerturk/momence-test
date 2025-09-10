@@ -1,0 +1,3 @@
+Invalid header format
+Country|Currency|Amount|Code|Rate
+Australia|dollar|1|AUD|15.234
