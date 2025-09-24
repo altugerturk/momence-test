@@ -38,8 +38,8 @@ A React-based currency converter that fetches real-time exchange rates from the 
 
 1. **Clone the repository**
    ```bash
-   git clone <your-repository-url>
-   cd momence-test
+   git clone https://github.com/altugerturk/cnb-currency-converter.git
+   cd cnb-currency-converter
    ```
 
 2. **Install dependencies**
