@@ -2,6 +2,10 @@
 
 A React-based currency converter that fetches real-time exchange rates from the Czech National Bank (CNB) and provides seamless currency conversion functionality.
 
+## 🌐 Live Demo
+
+**[Try the live application here!](https://cnb-currency-converter.netlify.app)**
+
 ## 🌟 Features
 
 - **Real-time Exchange Rates**: Fetches the latest currency exchange rates from CNB API
