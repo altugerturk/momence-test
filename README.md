@@ -7,6 +7,8 @@ A React-based currency converter that fetches real-time exchange rates from the 
 - **Real-time Exchange Rates**: Fetches the latest currency exchange rates from CNB API
 - **Interactive Currency Converter**: Convert any amount from foreign currencies to CZK
 - **Comprehensive Currency Display**: View all available exchange rates in an organized grid
+- **Single Page Application**: React Router for seamless navigation with fallback routing
+- **Modular Architecture**: Clean component separation with custom hooks and organized folder structure
 - **Input Validation**: Prevents invalid inputs and provides user feedback
 - **Error Handling**: Graceful handling of API failures and malformed data
 - **Responsive Design**: Clean, modern UI that works across different screen sizes
@@ -15,8 +17,10 @@ A React-based currency converter that fetches real-time exchange rates from the 
 ## 🛠️ Tech Stack
 
 - **Frontend**: React 19 with TypeScript
+- **Routing**: React Router DOM for SPA navigation
 - **Styling**: Styled Components for component-level styling
 - **HTTP Client**: Axios for API requests
+- **State Management**: Custom React hooks for data fetching and state
 - **Testing**:
   - Jest & React Testing Library for unit/integration tests
   - Cypress for end-to-end testing
@@ -101,42 +105,88 @@ npm run e2e
 
 ```
 src/
-├── __tests__/              # Test files
-│   ├── __fixtures__/        # Test data fixtures
-│   ├── App.integration.test.tsx
+├── __tests__/                    # Test files
+│   ├── __fixtures__/              # Test data fixtures
+│   ├── HomePage.integration.test.tsx
 │   ├── getCzkAmountFromRate.test.ts
 │   └── parseCNBData.test.ts
-├── components/             # Styled components
-│   └── StyledComponents.ts  # All styled-components definitions
-├── types/                   # TypeScript type definitions
+├── components/                   # Reusable UI components
+│   ├── CurrencyConverter/         # Currency conversion component
+│   │   ├── CurrencyConverter.tsx
+│   │   └── index.ts
+│   ├── ExchangeRates/            # Exchange rates display component
+│   │   ├── ExchangeRates.tsx
+│   │   └── index.ts
+│   └── StyledComponents.ts       # All styled-components definitions
+├── hooks/                        # Custom React hooks
+│   ├── useExchangeRates.ts       # Exchange rates data fetching hook
 │   └── index.ts
-├── utils/                   # Utility functions
+├── pages/                        # Page components
+│   ├── HomePage.tsx              # Main application page
+│   └── index.ts
+├── types/                        # TypeScript type definitions
+│   └── index.ts
+├── utils/                        # Utility functions
 │   ├── getCzkAmountFromRate.ts
 │   └── parseCNBData.ts
-├── App.tsx                  # Main application component
-└── index.tsx               # Application entry point
+├── App.tsx                       # Router configuration
+└── index.tsx                     # Application entry point
 
 cypress/
-├── e2e/                     # End-to-end test files
+├── e2e/                          # End-to-end test files
 │   └── currency-converter.cy.js
-└── support/                 # Cypress support files
+└── support/                      # Cypress support files
 ```
 
 ## 🔧 Key Components
 
-### Data Parsing (`parseCNBData.ts`)
+### Application Architecture
+
+#### Router Configuration (`App.tsx`)
+Main application router setup:
+- **Home Route (`/`)**: Displays the main currency converter page
+- **Fallback Route (`*`)**: Redirects any unknown paths to home
+- Clean separation of routing concerns from business logic
+
+#### Custom Hooks (`hooks/`)
+**`useExchangeRates`**: Custom hook for data management:
+- Fetches exchange rate data from CNB API
+- Manages loading, error, and success states
+- Provides clean interface for components
+
+#### Page Components (`pages/`)
+**`HomePage`**: Main application page that:
+- Orchestrates the overall page layout
+- Integrates CurrencyConverter and ExchangeRates components
+- Handles top-level state management
+
+#### Feature Components (`components/`)
+**`CurrencyConverter`**: Interactive conversion form:
+- Currency selection dropdown
+- Amount input with validation
+- Real-time conversion results
+- Exchange rate information display
+
+**`ExchangeRates`**: Comprehensive rates display:
+- Grid layout of all available currencies
+- Country and currency information
+- Current exchange rates
+
+### Utility Functions
+
+#### Data Parsing (`parseCNBData.ts`)
 Converts the CNB's pipe-delimited text format into structured TypeScript objects:
 - Extracts date and serial number from header
 - Parses exchange rate data for each currency
 - Handles data validation and error cases
 
-### Currency Conversion (`getCzkAmountFromRate.ts`)
+#### Currency Conversion (`getCzkAmountFromRate.ts`)
 Performs currency conversion calculations:
 - Handles different base amounts (e.g., JPY uses base of 100)
 - Validates input parameters
 - Returns precise conversion results
 
-### Type Definitions (`types/index.ts`)
+#### Type Definitions (`types/index.ts`)
 Provides TypeScript interfaces for:
 - `ExchangeRate`: Individual currency data structure
 - `CNBData`: Complete API response structure
@@ -163,9 +213,10 @@ Provides TypeScript interfaces for:
 - Clear conversion result display
 
 ### Testing Strategy
-- **Unit Tests**: Critical utility functions
-- **Integration Tests**: Component interactions and API integration
-- **E2E Tests**: Complete user workflows and edge cases
+- **Unit Tests**: Critical utility functions (parseCNBData, getCzkAmountFromRate)
+- **Integration Tests**: HomePage component with all interactions and API integration
+- **E2E Tests**: Complete user workflows and edge cases with Cypress
+- **Modular Testing**: Each component tested in isolation with proper mocking
 
 ## 🔍 Testing Coverage
 
@@ -179,11 +230,13 @@ The application includes comprehensive testing:
 ## 📋 Requirements Compliance
 
 ✅ **React Application**: Built with Create React App and React 19  
-✅ **Currency Data Fetching**: Retrieves latest rates from CNB API  
-✅ **Data Display**: Clear list of all exchange rates  
-✅ **Currency Converter**: Interactive form with CZK conversion  
-✅ **TypeScript**: Full TypeScript implementation  
+✅ **React Router**: Single Page Application with routing and fallback redirects  
+✅ **Currency Data Fetching**: Retrieves latest rates from CNB API via custom hooks  
+✅ **Data Display**: Clear list of all exchange rates in organized components  
+✅ **Currency Converter**: Interactive form with CZK conversion in dedicated component  
+✅ **TypeScript**: Full TypeScript implementation with comprehensive typing  
 ✅ **Styled Components**: Component-level styling architecture  
+✅ **Modular Architecture**: Clean separation of concerns with pages, components, and hooks  
 ✅ **Automated Testing**: Comprehensive test suite with Jest and Cypress  
 ✅ **Git History**: Progressive commits throughout development  
 
@@ -197,6 +250,40 @@ npm run build
 
 This creates a `build` folder with optimized production files ready for deployment.
 
+## 🏛️ Architecture Improvements
+
+### Recent Enhancements (v2.0)
+
+**React Router Implementation**:
+- Added React Router DOM for Single Page Application functionality
+- Main route (`/`) displays the currency converter application
+- Wildcard routing with automatic redirects to home page
+- Clean separation of routing logic from business components
+
+**Modular Architecture Refactoring**:
+- **Component Separation**: Split monolithic App.tsx into focused components
+- **Custom Hooks**: Extracted data fetching logic into `useExchangeRates` hook
+- **Page Structure**: Implemented proper page/component hierarchy
+- **Clean Imports**: Added barrel exports (index.ts files) for organized imports
+
+**Improved Code Organization**:
+- `pages/` - Top-level page components
+- `components/` - Reusable UI components with feature-based folders
+- `hooks/` - Custom React hooks for state and side effects
+- `utils/` - Pure utility functions
+- `types/` - TypeScript type definitions
+
+**Testing Architecture**:
+- Comprehensive integration tests for the main HomePage component
+- Proper mocking strategies for external dependencies
+- Maintained test coverage while improving code organization
+
+### Benefits of New Architecture
+1. **Maintainability**: Clear separation of concerns makes code easier to maintain
+2. **Scalability**: Component-based structure allows easy addition of new features
+3. **Reusability**: Modular components can be reused across different pages
+4. **Testing**: Isolated components are easier to test and mock
+5. **Developer Experience**: Clean imports and logical folder structure improve DX
 
 ## 🔮 Future Enhancements
 
@@ -207,11 +294,15 @@ This creates a `build` folder with optimized production files ready for deployme
 4. **Multi-directional Conversion**: Support conversion between any two currencies
 5. **Charts**: Add visual representation of rate trends
 6. **PWA Features**: Transform into a Progressive Web App
+7. **Additional Routes**: Add more pages (about, settings, history)
+8. **URL Parameters**: Store conversion state in URL for bookmarking
 
-### Technical Debt & Missing Requirements
-1. **React Query**: Uses Axios directly instead of React Query for data fetching
+### Technical Debt & Potential Improvements
+1. **React Query**: Could migrate from custom hook to React Query for advanced caching
 2. **Real-time Updates**: Add automatic data refresh capability
-3. **Component Separation**: Could extract smaller reusable components
+3. **Error Boundaries**: Implement React error boundaries for better error handling
+4. **Lazy Loading**: Add code splitting for routes and components
+5. **State Management**: Consider Redux or Zustand for complex state scenarios
 
 ## 🤝 Development Notes
 

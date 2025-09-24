@@ -1,0 +1,135 @@
+import React, { useState } from "react";
+import { CNBData } from "../../types";
+import { getCzkAmountFromRate } from "../../utils/getCzkAmountFromRate";
+import {
+  ConverterForm,
+  FormTitle,
+  FormGroup,
+  FormLabel,
+  AmountInput,
+  CurrencySelect,
+  CalculateButton,
+  ResultContainer,
+  ConversionResult,
+  ResultTitle,
+  ResultDisplay,
+  AmountFrom,
+  AmountTo,
+  EqualsSymbol,
+  RateInfo,
+} from "../StyledComponents";
+
+interface CurrencyConverterProps {
+  exchangeData: CNBData;
+}
+
+export const CurrencyConverter: React.FC<CurrencyConverterProps> = ({
+  exchangeData,
+}) => {
+  const [selected, setSelected] = useState<string | null>(null);
+  const [amount, setAmount] = useState<number>(1);
+  const [convertedAmount, setConvertedAmount] = useState<number | null>(null);
+  const [isCalculated, setIsCalculated] = useState<boolean>(false);
+
+  const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelected(e.target.value);
+    setIsCalculated(false); // Reset calculation when currency changes
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseFloat(e.target.value) || 0;
+    setAmount(value);
+    setIsCalculated(false); // Reset calculation when amount changes
+  };
+
+  const handleCalculate = () => {
+    if (!selected || !exchangeData) {
+      alert("Please select a currency first");
+      return;
+    }
+
+    const result = getCzkAmountFromRate(selected, amount, exchangeData.rates);
+    setConvertedAmount(result);
+    setIsCalculated(true);
+  };
+
+  const getSelectedCurrencyInfo = () => {
+    if (!selected || !exchangeData) return null;
+    return exchangeData.rates.find((rate) => rate.code === selected);
+  };
+
+  return (
+    <ConverterForm>
+      <FormTitle>Currency Converter</FormTitle>
+      <FormGroup>
+        <FormLabel htmlFor="amount">Amount to be converted to CZK:</FormLabel>
+        <AmountInput
+          type="number"
+          id="amount"
+          value={amount}
+          onChange={handleAmountChange}
+          placeholder="Enter amount"
+          min="0"
+          step="0.01"
+        />
+      </FormGroup>
+
+      <FormGroup>
+        <FormLabel htmlFor="currency">From Currency:</FormLabel>
+        <CurrencySelect
+          id="currency"
+          name="select"
+          onChange={handleChangeSelect}
+          value={selected || ""}
+        >
+          <option value="" disabled>
+            Select a currency
+          </option>
+          {exchangeData.rates.map((rate) => (
+            <option value={rate.code} key={rate.code}>
+              {rate.code} - {rate.country} ({rate.currency})
+            </option>
+          ))}
+        </CurrencySelect>
+      </FormGroup>
+
+      <CalculateButton
+        onClick={handleCalculate}
+        disabled={!selected || amount <= 0}
+      >
+        Convert to CZK
+      </CalculateButton>
+
+      {isCalculated && convertedAmount !== null && selected && (
+        <ResultContainer>
+          <ConversionResult>
+            <ResultTitle>Conversion Result</ResultTitle>
+            <ResultDisplay>
+              <AmountFrom>
+                {amount.toLocaleString()} {selected}
+              </AmountFrom>
+              <EqualsSymbol>=</EqualsSymbol>
+              <AmountTo>
+                {convertedAmount.toLocaleString("en-US", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}{" "}
+                CZK
+              </AmountTo>
+            </ResultDisplay>
+            {getSelectedCurrencyInfo() && (
+              <RateInfo>
+                Exchange rate: 1 {selected} ={" "}
+                {(
+                  getSelectedCurrencyInfo()!.rate /
+                  getSelectedCurrencyInfo()!.amount
+                ).toFixed(4)}{" "}
+                CZK
+              </RateInfo>
+            )}
+          </ConversionResult>
+        </ResultContainer>
+      )}
+    </ConverterForm>
+  );
+};
